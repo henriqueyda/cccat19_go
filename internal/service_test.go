@@ -11,7 +11,7 @@ import (
 func TestServices(t *testing.T) {
 	ctx := context.Background()
 	t.Run("Deve criar uma conta de passageiro", func(t *testing.T) {
-		signup, getAccount := setupTest()
+		signup, getAccount := setupTest(t)
 		signupID, err := signup.Signup(ctx, SignupInput{
 			Name:        "John Doe",
 			Email:       "john.doe@gmail.com",
@@ -30,7 +30,7 @@ func TestServices(t *testing.T) {
 		assert.Equal(t, true, outputGetAccount.IsPassenger)
 	})
 	t.Run("Deve criar uma conta de motorista", func(t *testing.T) {
-		signup, getAccount := setupTest()
+		signup, getAccount := setupTest(t)
 		signupID, err := signup.Signup(ctx, SignupInput{
 			Name:     "John Doe",
 			Email:    "john.doe@gmail.com",
@@ -51,7 +51,7 @@ func TestServices(t *testing.T) {
 		assert.Equal(t, true, outputGetAccount.IsDriver)
 	})
 	t.Run("Não deve criar uma conta de passageiro com o nome inválido", func(t *testing.T) {
-		signup, _ := setupTest()
+		signup, _ := setupTest(t)
 		_, err := signup.Signup(ctx, SignupInput{
 			Name:        "John",
 			Email:       "john.doe@gmail.com",
@@ -62,7 +62,7 @@ func TestServices(t *testing.T) {
 		assert.ErrorIs(t, err, ErrInvalidName)
 	})
 	t.Run("Não deve criar uma conta de passageiro com o email inválido", func(t *testing.T) {
-		signup, _ := setupTest()
+		signup, _ := setupTest(t)
 		_, err := signup.Signup(ctx, SignupInput{
 			Name:        "John Doe",
 			Email:       "john.doe",
@@ -73,7 +73,7 @@ func TestServices(t *testing.T) {
 		assert.ErrorIs(t, err, ErrInvalidEmail)
 	})
 	t.Run("Não deve criar uma conta de passageiro com cpf inválido", func(t *testing.T) {
-		signup, _ := setupTest()
+		signup, _ := setupTest(t)
 		_, err := signup.Signup(ctx, SignupInput{
 			Name:        "John Doe",
 			Email:       "john.doe@gmail.com",
@@ -84,7 +84,7 @@ func TestServices(t *testing.T) {
 		assert.ErrorIs(t, err, ErrInvalidCpf)
 	})
 	t.Run("Não deve criar uma conta de motorista com placa do carro inválida", func(t *testing.T) {
-		signup, _ := setupTest()
+		signup, _ := setupTest(t)
 		_, err := signup.Signup(ctx, SignupInput{
 			Name:     "John Doe",
 			Email:    "john.doe@gmail.com",
@@ -96,7 +96,7 @@ func TestServices(t *testing.T) {
 		assert.ErrorIs(t, err, ErrInvalidCarPlate)
 	})
 	t.Run("Não deve criar uma conta de passageiro com conta duplicada", func(t *testing.T) {
-		signup, _ := setupTest()
+		signup, _ := setupTest(t)
 		input := SignupInput{
 			Name:     "John Doe",
 			Email:    "john.doe@gmail.com",
@@ -112,9 +112,10 @@ func TestServices(t *testing.T) {
 	})
 }
 
-func setupTest() (*Signup, *GetAccount) {
+func setupTest(t *testing.T) (*Signup, *GetAccount) {
 	accountDAO := NewAccountDAOMemory(&[]Account{})
 	// accountDAO := NewAccountDAODatabase()
+	// cleanUpDB(t, "postgres://postgres:123456@localhost:5432/app")
 	mailerGateway := NewMailerGatewayMemory()
 	signup := NewSignup(accountDAO, mailerGateway)
 	getAccount := NewGetAccount(accountDAO)
