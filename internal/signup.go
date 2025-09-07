@@ -21,7 +21,8 @@ var (
 	ErrInvalidCpf           = errors.New("invalid cpf")
 )
 
-// ISP - Interface Segregation Principle
+// ISP - Interface Segregation Principle - SignupData interface is declared next to the code that uses it and defines exactly what it needs to work.
+// This turn this struct independent from external interfaces.
 type SignupData interface {
 	SaveAccount(ctx context.Context, account Account) error
 	GetAccountByEmail(ctx context.Context, email string) (Account, error)
@@ -38,6 +39,8 @@ type SignupInput struct {
 }
 
 type Signup struct {
+	// DIP - Dependency Inversion Principle - Signup depends on abstractions, not on implementations. Using interfaces, we eliminate the signup dependencies from database.
+	// The interface is more useful to the code that uses it, not the code that implements it.
 	signupData    SignupData
 	mailerGateway MailerGateway
 }

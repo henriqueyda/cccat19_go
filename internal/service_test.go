@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestServices(t *testing.T) {
@@ -18,9 +19,9 @@ func TestServices(t *testing.T) {
 			Password:    "123456",
 			IsPassenger: true,
 		})
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		outputGetAccount, err := getAccount.GetAccountByID(ctx, signupID)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.NotEmpty(t, outputGetAccount.AccountID)
 		assert.Equal(t, "John Doe", outputGetAccount.Name)
 		assert.Equal(t, "john.doe@gmail.com", outputGetAccount.Email)
@@ -38,9 +39,9 @@ func TestServices(t *testing.T) {
 			CarPlate: "AAA9999",
 			IsDriver: true,
 		})
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		outputGetAccount, err := getAccount.GetAccountByID(ctx, signupID)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.NotEmpty(t, outputGetAccount.AccountID)
 		assert.Equal(t, "John Doe", outputGetAccount.Name)
 		assert.Equal(t, "john.doe@gmail.com", outputGetAccount.Email)
@@ -105,7 +106,7 @@ func TestServices(t *testing.T) {
 			IsDriver: true,
 		}
 		_, err := signup.Signup(ctx, input)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		_, err = signup.Signup(ctx, input)
 		assert.ErrorIs(t, err, ErrAccountAlreadyExists)
 	})
@@ -113,6 +114,7 @@ func TestServices(t *testing.T) {
 
 func setupTest() (*Signup, *GetAccount) {
 	accountDAO := NewAccountDAOMemory(&[]Account{})
+	// accountDAO := NewAccountDAODatabase()
 	mailerGateway := NewMailerGatewayMemory()
 	signup := NewSignup(accountDAO, mailerGateway)
 	getAccount := NewGetAccount(accountDAO)

@@ -18,6 +18,7 @@ type Account struct {
 	IsDriver    bool   `json:"is_driver"`
 }
 
+// DAO - Data Access Object
 type AccountDAO interface {
 	SaveAccount(ctx context.Context, account Account) error
 	GetAccountByEmail(ctx context.Context, email string) (Account, error)

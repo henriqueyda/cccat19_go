@@ -11,10 +11,10 @@ import (
 
 	"github.com/jackc/pgx/v5"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestApi(t *testing.T) {
-	// ctx := context.Background()
 	t.Run("Deve criar uma conta de passageiro", func(t *testing.T) {
 		cleanUpDB(t, "postgres://postgres:123456@localhost:5432/app")
 		input := SignupInput{
@@ -25,26 +25,26 @@ func TestApi(t *testing.T) {
 			IsPassenger: true,
 		}
 		jsonInput, err := json.Marshal(input)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		respSignup, err := http.Post("http://localhost:8080/signup", "application/json", bytes.NewBuffer(jsonInput))
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.Equal(t, http.StatusOK, respSignup.StatusCode)
 		defer respSignup.Body.Close()
 		body, err := io.ReadAll(respSignup.Body)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		var output struct {
 			AccountID string `json:"account_id"`
 		}
 		err = json.Unmarshal(body, &output)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		respGet, err := http.Get(fmt.Sprintf("http://localhost:8080/accounts/%s", output.AccountID))
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		defer respGet.Body.Close()
 		var outputGetAccount Account
 		err = json.NewDecoder(respGet.Body).Decode(&outputGetAccount)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.NotEmpty(t, outputGetAccount.AccountID)
 		assert.Equal(t, "John Doe", outputGetAccount.Name)
 		assert.Equal(t, "john.doe@gmail.com", outputGetAccount.Email)
@@ -63,17 +63,17 @@ func TestApi(t *testing.T) {
 			IsPassenger: true,
 		}
 		jsonInput, err := json.Marshal(input)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 
 		respSignup, err := http.Post("http://localhost:8080/signup", "application/json", bytes.NewBuffer(jsonInput))
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.Equal(t, http.StatusUnprocessableEntity, respSignup.StatusCode)
 		defer respSignup.Body.Close()
 		body, err := io.ReadAll(respSignup.Body)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		var apiError APIError
 		err = json.Unmarshal(body, &apiError)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		assert.Equal(t, "Error signing up: invalid name", apiError.Msg)
 	})
 }

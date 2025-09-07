@@ -62,6 +62,7 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 
 func GetAccountHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
+	// accountDAO := NewAccountDAOMemory(&accounts)
 	accountDAO := NewAccountDAODatabase()
 	getAccount := NewGetAccount(accountDAO)
 	account, err := getAccount.GetAccountByID(ctx, r.PathValue("account_id"))
