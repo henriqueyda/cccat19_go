@@ -24,8 +24,8 @@ type APIError struct {
 
 func SignupHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	// accountDAO := NewAccountDAOMemory(&accounts)
-	accountDAO := NewAccountDAODatabase()
+	// accountRepository := NewAccountRepositoryMemory(&accounts)
+	accountRepository := NewAccountRepositoryDatabase()
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		JSONError(w, APIError{Msg: fmt.Sprintf("Error reading request body: %s", err)}, http.StatusInternalServerError)
@@ -40,8 +40,8 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 
 	mailerGateway := NewMailerGatewayMemory()
 
-	signup := NewSignup(accountDAO, mailerGateway)
-	accountID, err := signup.Signup(ctx, input)
+	signup := NewSignup(accountRepository, mailerGateway)
+	accountID, err := signup.Execute(ctx, input)
 	if err != nil {
 		JSONError(w, APIError{Msg: fmt.Sprintf("Error signing up: %s", err)}, http.StatusUnprocessableEntity)
 		return
@@ -62,10 +62,10 @@ func SignupHandler(w http.ResponseWriter, r *http.Request) {
 
 func GetAccountHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	// accountDAO := NewAccountDAOMemory(&accounts)
-	accountDAO := NewAccountDAODatabase()
-	getAccount := NewGetAccount(accountDAO)
-	account, err := getAccount.GetAccountByID(ctx, r.PathValue("account_id"))
+	// accountRepository := NewAccountRepositoryMemory(&accounts)
+	accountRepository := NewAccountRepositoryDatabase()
+	getAccount := NewGetAccount(accountRepository)
+	account, err := getAccount.Execute(ctx, r.PathValue("account_id"))
 	if err != nil {
 		JSONError(w, APIError{Msg: fmt.Sprintf("Error getting account: %s", err)}, http.StatusInternalServerError)
 		return

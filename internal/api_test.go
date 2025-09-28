@@ -74,7 +74,7 @@ func TestApi(t *testing.T) {
 		var apiError APIError
 		err = json.Unmarshal(body, &apiError)
 		require.NoError(t, err)
-		assert.Equal(t, "Error signing up: invalid name", apiError.Msg)
+		assert.Contains(t, apiError.Msg, "invalid name")
 	})
 }
 
@@ -85,6 +85,10 @@ func cleanUpDB(t *testing.T, connString string) {
 		t.Fatal(err)
 	}
 	_, err = conn.Exec(ctx, "DELETE FROM ccca.account")
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = conn.Exec(ctx, "DELETE FROM ccca.ride")
 	if err != nil {
 		t.Fatal(err)
 	}

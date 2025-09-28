@@ -17,6 +17,6 @@ func NewGetAccount(getAccountData GetAccountData) *GetAccount {
 	}
 }
 
-func (g *GetAccount) GetAccountByID(ctx context.Context, accountID string) (Account, error) {
+func (g *GetAccount) Execute(ctx context.Context, accountID string) (Account, error) {
 	return g.getAccountData.GetAccountByID(ctx, accountID)
 }
